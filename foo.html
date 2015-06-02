@@ -68,7 +68,7 @@
       var wPost="";
       if (n[i].hasOwnProperty("_link")) {
         logStr += "_w " + n[i]['_link'] + " ";
-        wPre = '<a href="' + n[i]['_link'] + '"> ';
+        wPre = '<a href="' + n[i]['_link'] + '" target="_blank"> ';
         wPost = '</a> ';
         e['xlink'] = n[i]['_link'];
         delete n[i]['_link'];
@@ -129,23 +129,23 @@
     }
     var p = $("#nh").fancytree("getActiveNode");
     if ( ! p ) {
-      alert("please select a node to which to add");
-      return();
+      alert("adding: please select a node first");
+      return;
     }
     console.log("parent: " + p.title);
     console.log("parent key: " + p.key);
     var nchild = { // grab vals via jq 
       title : $("#add_title").val(),
-      name : $("#add_common").val(),
+      common : $("#add_common").val(),
       link : $("#add_link").val(),
       comment : $("#add_comment").val()
     };
-    console.log("vals: " + nchild.title + " " + nchild.name);
+    console.log("vals: " + nchild.title + " " + nchild.common);
     p.addChildren( { title: nchild.title } );  // waste of time; redrawn
     var ntObject = {};
     ntObject[ nchild.title ] = {};
-    if (nchild.name && nchild.name != "") {
-      ntObject[ nchild.title ]["_common"] = nchild.name;
+    if (nchild.common && nchild.common != "") {
+      ntObject[ nchild.title ]["_common"] = nchild.common;
     }
     if (nchild.link && nchild.link != "") {
       ntObject[ nchild.title ]["_link"] = nchild.link;
@@ -157,6 +157,36 @@
     addHere.update( ntObject, function(err) {
       if (err) { console.log("update of "+nchild.title+" failed: "+err );
       } else { console.log("ok update of "+nchild.title );
+      } 
+    } );
+  }
+
+  function editChild( fbRef ) {
+    // auth code??
+    console.log("saving edit of ");
+    var p = $("#nh").fancytree("getActiveNode");
+    if ( ! p ) {
+      alert("editing: please select a node first");
+      return;
+    }
+    console.log("parent: " + p.title);
+    console.log("parent key: " + p.key);
+    // note - can't change title !! (??)
+    var ntitle = $("#add_title").val();
+    var nchild = { // grab vals via jq 
+      // title : $("#add_title").val(), // can't change title
+      _common : $("#add_common").val(),
+      _link : $("#add_link").val(),
+      _comment : $("#add_comment").val()
+    };
+    console.log(" common: " + nchild["_common"] );
+    console.log("comment: " + nchild["_comment"] );
+    // hmmmm.... if we've changed some val to ""
+    // now, we can just use nchild
+    var addHere = fbRef.child(p.key);
+    addHere.update( nchild, function(err) {
+      if (err) { console.log("update of "+ntitle+" failed: "+err );
+      } else { console.log("ok update of "+ntitle );
       } 
     } );
   }
@@ -177,6 +207,7 @@
       height: 400,
       width: 650,
       modal: true,
+      // buttons are added in on('click' event
       buttons: [
         { text:"Add child...", 
           click: function(){ 
@@ -196,15 +227,40 @@
         console.log("dialog cancel");
       }
     } );
+    // buttons
+    var cancelDialogButton = { text: "Cancel",
+          click: function() {
+            dialog.dialog( "close" );
+          }
+       };
+    var addChildButtons = [
+        { text:"Add child...", 
+          click: function(){ 
+            addChild(fbRef);
+            dialog.dialog( "close" );
+          } 
+        },
+        cancelDialogButton
+      ];
+    var editChildButtons = [
+        { text:"Save ...", 
+          click: function(){ 
+            editChild(fbRef);
+            dialog.dialog( "close" );
+          } 
+        },
+        cancelDialogButton
+      ];
     // connect button to dialog
     $("#AddChild").button().on('click', function(event) {
+      dialog.dialog('option', 'title', 'Add child...');
+      dialog.dialog('option', 'buttons', addChildButtons);
       dialog.dialog("open");
     } );
     // add some fancy title; hmmm should be done elsewhere?
     $("#addchild-form").on("dialogopen", function() {
       var p = $("#nh").fancytree("getActiveNode");
       if ( p ) {
-        console.log("add dialog open set title to: " + p.key);
        $("#addchild-label").html(p.key);
       }
     } );
@@ -215,8 +271,8 @@
         alert("Please select item to edit...");
         return;
       }
-      console.log("edit dialog open set title to: " + p.key);
       $("#addchild-label").html(p.key);
+      dialog.dialog('option', 'buttons', editChildButtons);
       dialog.dialog('option', 'title', 'Editing...');
       // set up new defaults
       $("#add_title").val(p.data.xtitle);
