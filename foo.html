@@ -128,37 +128,37 @@
       }
     }
     var p = $("#nh").fancytree("getActiveNode");
-    if ( p ) {
-      console.log("parent: " + p.title);
-      console.log("parent key: " + p.key);
-      var nchild = { // grab vals via jq 
-        title : $("#add_title").val(),
-        name : $("#add_common").val(),
-        link : $("#add_link").val(),
-        comment : $("#add_comment").val()
-      };
-      console.log("vals: " + nchild.title + " " + nchild.name);
-      p.addChildren( { title: nchild.title } );  // waste of time; redrawn
-      var ntObject = {};
-      ntObject[ nchild.title ] = {};
-      if (nchild.name && nchild.name != "") {
-        ntObject[ nchild.title ]["_common"] = nchild.name;
-      }
-      if (nchild.link && nchild.link != "") {
-        ntObject[ nchild.title ]["_link"] = nchild.link;
-      }
-      if (nchild.comment && nchild.comment != "") {
-        ntObject[ nchild.title ]["_comment"] = nchild.comment;
-      }
-      var addHere = fbRef.child(p.key);
-      addHere.update( ntObject, function(err) {
-        if (err) { console.log("update of "+nchild.title+" failed: "+err );
-        } else { console.log("ok update of "+nchild.title );
-        } 
-      } );
-    } else {
+    if ( ! p ) {
       alert("please select a node to which to add");
+      return();
+    }
+    console.log("parent: " + p.title);
+    console.log("parent key: " + p.key);
+    var nchild = { // grab vals via jq 
+      title : $("#add_title").val(),
+      name : $("#add_common").val(),
+      link : $("#add_link").val(),
+      comment : $("#add_comment").val()
     };
+    console.log("vals: " + nchild.title + " " + nchild.name);
+    p.addChildren( { title: nchild.title } );  // waste of time; redrawn
+    var ntObject = {};
+    ntObject[ nchild.title ] = {};
+    if (nchild.name && nchild.name != "") {
+      ntObject[ nchild.title ]["_common"] = nchild.name;
+    }
+    if (nchild.link && nchild.link != "") {
+      ntObject[ nchild.title ]["_link"] = nchild.link;
+    }
+    if (nchild.comment && nchild.comment != "") {
+      ntObject[ nchild.title ]["_comment"] = nchild.comment;
+    }
+    var addHere = fbRef.child(p.key);
+    addHere.update( ntObject, function(err) {
+      if (err) { console.log("update of "+nchild.title+" failed: "+err );
+      } else { console.log("ok update of "+nchild.title );
+      } 
+    } );
   }
  
   $(document).ready(function() {
