@@ -169,61 +169,62 @@ body {
 
       $("#nh").fancytree({source: nhFancyTree});
       $("#nh").fancytree("getRootNode").visit(function(node){ node.setExpanded(true); });
-
-
-      var dialog;
-      dialog = $( "#addchild-form" ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 650,
-        modal: true,
-        buttons: [
-          { text:"Add child...", 
-            click: function(){ 
-              addChild(fbRef);
-              dialog.dialog( "close" );
-            } 
-          },
-          { text: "Cancel",
-            click: function() {
-              dialog.dialog( "close" );
-            }
-         }
-        ],
-        close: function() {
-          //form[ 0 ].reset();
-          //allFields.removeClass( "ui-state-error" );
-          console.log("dialog cancel");
-        }
-     } );
-     $("#AddChild").button().on('click', function(event) {
-       dialog.dialog("open");
-     } );
-     $("#addchild-form").on("dialogopen", function() {
-       var p = $("#nh").fancytree("getActiveNode");
-       if ( p ) {
-         console.log("add dialog open set title to: " + p.key);
-         $("#addchild-label").html(p.key);
-       }
-     } );
-     $("#EditChild").button().on('click', function(event) {
-       var p = $("#nh").fancytree("getActiveNode");
-       if ( ! p ) {
-         alert("Please select item to edit...");
-         return;
-       }
-       console.log("edit dialog open set title to: " + p.key);
-       $("#addchild-label").html(p.key);
-       dialog.dialog('option', 'title', 'Editing...');
-       // set up new defaults
-       $("#add_title").val(p.data.xtitle);
-       $("#add_common").val(p.data.xcommon);
-       $("#add_link").val(p.data.xlink);
-       $("#add_comment").val(p.data.xcomment);
-       dialog.dialog("open");
-     } );
     });
 
+    // create the modal dialog box
+    var dialog = $( "#addchild-form" ).dialog({
+      autoOpen: false,
+      height: 400,
+      width: 650,
+      modal: true,
+      buttons: [
+        { text:"Add child...", 
+          click: function(){ 
+            addChild(fbRef);
+            dialog.dialog( "close" );
+          } 
+        },
+        { text: "Cancel",
+          click: function() {
+            dialog.dialog( "close" );
+          }
+       }
+      ],
+      close: function() {
+        //form[ 0 ].reset();
+        //allFields.removeClass( "ui-state-error" );
+        console.log("dialog cancel");
+      }
+    } );
+    // connect button to dialog
+    $("#AddChild").button().on('click', function(event) {
+      dialog.dialog("open");
+    } );
+    // add some fancy title; hmmm should be done elsewhere?
+    $("#addchild-form").on("dialogopen", function() {
+      var p = $("#nh").fancytree("getActiveNode");
+      if ( p ) {
+        console.log("add dialog open set title to: " + p.key);
+       $("#addchild-label").html(p.key);
+      }
+    } );
+    // connect the edit button to dialog
+    $("#EditChild").button().on('click', function(event) {
+      var p = $("#nh").fancytree("getActiveNode");
+      if ( ! p ) {
+        alert("Please select item to edit...");
+        return;
+      }
+      console.log("edit dialog open set title to: " + p.key);
+      $("#addchild-label").html(p.key);
+      dialog.dialog('option', 'title', 'Editing...');
+      // set up new defaults
+      $("#add_title").val(p.data.xtitle);
+      $("#add_common").val(p.data.xcommon);
+      $("#add_link").val(p.data.xlink);
+      $("#add_comment").val(p.data.xcomment);
+      dialog.dialog("open");
+    } );
   });
 </script>
 </head>
