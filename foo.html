@@ -207,20 +207,7 @@
       height: 400,
       width: 650,
       modal: true,
-      // buttons are added in on('click' event
-      buttons: [
-        { text:"Add child...", 
-          click: function(){ 
-            addChild(fbRef);
-            dialog.dialog( "close" );
-          } 
-        },
-        { text: "Cancel",
-          click: function() {
-            dialog.dialog( "close" );
-          }
-       }
-      ],
+      // buttons are added in on('click' event, just below
       close: function() {
         //form[ 0 ].reset();
         //allFields.removeClass( "ui-state-error" );
