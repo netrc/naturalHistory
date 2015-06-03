@@ -80,16 +80,20 @@
       e['title'] = NH[k] +': <span class="nh'+NH[k]+'">'+  wPre + i + wPost + '</span>';
       e['xtitle'] = i;
       e['key'] = kta.join("/");
-      if (n[i].hasOwnProperty("_common") && (n[i]["_common"]!="") ) {
+      if (n[i].hasOwnProperty("_common")  ) {
         logStr += "_c " + n[i]['_common'] + " ";
-        e['title'] += '<span class="nhCommon"> &nbsp; ' + n[i]['_common']+ " </span>";
-        e['xcommon'] = n[i]['_common'];
+        if (n[i]["_common"]!="") {
+          e['title'] += '<span class="nhCommon"> &nbsp; ' + n[i]['_common']+ " </span>";
+          e['xcommon'] = n[i]['_common'];
+        }
         delete n[i]['_common'];
       };
-      if (n[i].hasOwnProperty("_comment") && (n[i]["_comment"]!="") ) {
+      if (n[i].hasOwnProperty("_comment")  ) {
         logStr += "_m " + n[i]['_comment'] + " ";
-        e['title'] += '<span class="nhComment"> -  ' + n[i]['_comment'] + " </span>";
-        e['xcomment'] = n[i]['_comment'];
+        if (n[i]["_comment"]!="") {
+          e['title'] += '<span class="nhComment"> -  ' + n[i]['_comment'] + " </span>";
+          e['xcomment'] = n[i]['_comment'];
+        }
         delete n[i]['_comment'];
       };
       console.log("c2 logStr: " + logStr);
