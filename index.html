@@ -80,19 +80,19 @@
       e['title'] = NH[k] +': <span class="nh'+NH[k]+'">'+  wPre + i + wPost + '</span>';
       e['xtitle'] = i;
       e['key'] = kta.join("/");
-      if (n[i].hasOwnProperty("_common")) {
+      if (n[i].hasOwnProperty("_common") && (n[i]["_common"]!="") ) {
         logStr += "_c " + n[i]['_common'] + " ";
         e['title'] += '<span class="nhCommon"> &nbsp; ' + n[i]['_common']+ " </span>";
         e['xcommon'] = n[i]['_common'];
         delete n[i]['_common'];
       };
-      if (n[i].hasOwnProperty("_comment")) {
+      if (n[i].hasOwnProperty("_comment") && (n[i]["_comment"]!="") ) {
         logStr += "_m " + n[i]['_comment'] + " ";
         e['title'] += '<span class="nhComment"> -  ' + n[i]['_comment'] + " </span>";
         e['xcomment'] = n[i]['_comment'];
         delete n[i]['_comment'];
       };
-      //console.log("c2 logStr: " + logStr);
+      console.log("c2 logStr: " + logStr);
       // we've deleted text props from n[i], 
       //    so next for loop will just do subtrees if any
       var rt = convertToFT2(n[i], k+1,kta);   
@@ -166,13 +166,12 @@
 
   function editChild( fbRef ) {
     // auth code??
-    console.log("saving edit of ");
     var p = $("#nh").fancytree("getActiveNode");
     if ( ! p ) {
       alert("editing: please select a node first");
       return;
     }
-    console.log("parent: " + p.title);
+    console.log("saving edit of parent: " + p.title);
     console.log("parent key: " + p.key);
     // note - can't change title !! (??)
     var ntitle = $("#add_title").val();
@@ -188,6 +187,7 @@
     // now, we can just use nchild
     var addHere = fbRef.child(p.key);
     addHere.update( nchild, function(err) {
+      // this is called *after* the .on("Value" callback
       if (err) { console.log("update of "+ntitle+" failed: "+err );
       } else { console.log("ok update of "+ntitle );
       } 
@@ -196,13 +196,27 @@
  
   $(document).ready(function() {
     var fbRef = new Firebase("https://netrc-nathistory.firebaseio.com");
+    var ft;
     fbRef.child('tree').on("value", function(snapshot) {
       console.log("firebase on value fired");
       var treeData = snapshot.val(); 
       var nhFancyTree = convertToFT2( treeData, 0, ['tree'] );
 
-      $("#nh").fancytree({source: nhFancyTree});
-      $("#nh").fancytree("getRootNode").visit(function(node){ node.setExpanded(true); });
+      // Can't get the fancytree to redraw
+      if (!ft) { // first time
+        $("#nh").fancytree({source: nhFancyTree});
+        ft = $("#nh").fancytree('getRootNode');
+        ft.visit(function(node){ node.setExpanded(true); node.render(); });
+      } else {
+        $("#nh").fancytree({source: nhFancyTree});
+        //  ft.tree.reload({source: nhFancyTree}).done(function(){ console.log("reloaded!"); });
+        //$("#nh").fancytree('getTree').reload({source: nhFancyTree});
+        //}
+        // $("#nh").empty();
+        // $("#nh").fancytree({source: nhFancyTree});
+        ft = $("#nh").fancytree('getRootNode');
+        ft.visit(function(node){ node.setExpanded(true); node.render(); });
+      }
     });
 
     // create the modal dialog box
