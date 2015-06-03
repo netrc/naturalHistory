@@ -197,6 +197,7 @@
   $(document).ready(function() {
     var fbRef = new Firebase("https://netrc-nathistory.firebaseio.com");
     var ft;
+    var dialog; // declared here, so as to use in dblclick function
     fbRef.child('tree').on("value", function(snapshot) {
       console.log("firebase on value fired");
       var treeData = snapshot.val(); 
@@ -204,7 +205,13 @@
 
       // Can't get the fancytree to redraw
       if (!ft) { // first time
-        $("#nh").fancytree({source: nhFancyTree});
+        $("#nh").fancytree({source: nhFancyTree, dblclick: function(e,d) {
+          console.log("dbl node: " + d.node.title);
+          // need to refactor
+          dialog.dialog('option', 'title', 'Add child...');
+          dialog.dialog('option', 'buttons', addChildButtons);
+          dialog.dialog("open");
+        } });
         ft = $("#nh").fancytree('getRootNode');
         ft.visit(function(node){ node.setExpanded(true); node.render(); });
       } else {
@@ -220,7 +227,7 @@
     });
 
     // create the modal dialog box
-    var dialog = $( "#addchild-form" ).dialog({
+    dialog = $( "#addchild-form" ).dialog({
       autoOpen: false,
       height: 400,
       width: 650,
@@ -292,7 +299,7 @@
 
 <body>
 
-<h2> Natural History of 7 Byron Road </h2>
+<h2> Natural History </h2>
 
 <div id="nh">
 </div>
