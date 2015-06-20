@@ -6,13 +6,17 @@
 <meta name="natural history" content="netrc"/>
 <title> natural history </title>
 
-<link  href="http://fonts.googleapis.com/css?family=Syncopate:regular,bold" rel="stylesheet" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Tangerine:700' rel='stylesheet' type='text/css'>
 
 <style type="text/css">
   body {
 	  background-color: #A0A0A0;
   }
-
+  .nhTitle {
+    font-family:"Tangerine", Times, serif;
+    font-weight: bold;
+    font-size: 48pt;
+  }
   .nhKingdom {
     font-weight: bold;
   }
@@ -197,6 +201,33 @@
       } 
     } );
   }
+
+  function countK( k ) {
+    var n = 0;
+    var nc = {};
+    for (var p in k) {
+      for (var c in k[p]) {
+        nc[c] = 0;
+        for (var o in k[p][c]) {
+          for (var f in k[p][c][o]) {
+            for (var g in k[p][c][o][f]) {
+              n++;
+              nc[c]++;
+            }
+          }
+        }
+      }
+    }
+    return { "n": n , "nc": nc } ;
+  }
+
+  function doCensus( td ) {
+    var c = {};
+    for (var k in td) { // toplevel is kingdom
+      c[k] = countK(td[k]);
+    }
+    return c;
+  }
  
   $(document).ready(function() {
     var fbRef = new Firebase("https://netrc-nathistory.firebaseio.com");
@@ -217,7 +248,7 @@
           dialog.dialog("open");
         } });
         ft = $("#nh").fancytree('getRootNode');
-        ft.visit(function(node){ node.setExpanded(true); node.render(); });
+        //ft.visit(function(node){ node.setExpanded(true); node.render(); });
       } else {
         $("#nh").fancytree({source: nhFancyTree});
         //  ft.tree.reload({source: nhFancyTree}).done(function(){ console.log("reloaded!"); });
@@ -226,8 +257,23 @@
         // $("#nh").empty();
         // $("#nh").fancytree({source: nhFancyTree});
         ft = $("#nh").fancytree('getRootNode');
-        ft.visit(function(node){ node.setExpanded(true); node.render(); });
+        //ft.visit(function(node){ node.setExpanded(true); node.render(); });
       }
+
+      var census = doCensus( treeData ); // k #s, k-c #s
+      var cString = "Census: ";
+      for (var k in census) {
+        cString += k +":" + census[k]["n"] + " ";
+        if ("nc" in census[k]) {
+          cString += "(";
+          for (var c in census[k]["nc"]) {
+            cString += c +":" + census[k]["nc"][c] + " ";
+          }
+          cString += ") &nbsp; &nbsp;";
+        }
+      }
+      $("#census").html(cString);
+
     });
 
     // create the modal dialog box
@@ -303,8 +349,9 @@
 
 <body>
 
-<h2> Natural History </h2>
+<h2 class="nhTitle"> Natural History of Caldwell, New Jersey</h2>
 
+<p id="census"> Census - Animals:... Plants:... Fungus:...<p>
 <div id="nh">
 </div>
 <hr>
